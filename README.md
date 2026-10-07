@@ -9,6 +9,7 @@ MedSync2 includes an Azure Essentials operationalization package for turning clo
 - [`docs/azure-essentials-operationalization.md`](docs/azure-essentials-operationalization.md): source boundary, operating model, official-resource index, and implementation gates.
 - [`docs/cloud-adoption-backlog.md`](docs/cloud-adoption-backlog.md): P0/P1/P2 backlog for issues and pull requests.
 - [`docs/architecture/azure-landing-zone-decision-record.md`](docs/architecture/azure-landing-zone-decision-record.md): starter decision record for Azure landing-zone planning.
+- [`docs/architecture/identity-and-access-decision-record.md`](docs/architecture/identity-and-access-decision-record.md): starter decision record for the Microsoft Entra ID identity and access model.
 - [`.github/ISSUE_TEMPLATE/azure-essentials-task.md`](.github/ISSUE_TEMPLATE/azure-essentials-task.md): issue template for Azure Essentials-aligned work.
 - [`.github/ISSUE_TEMPLATE/data-model-task.md`](.github/ISSUE_TEMPLATE/data-model-task.md): issue template for data model and schema changes.
 - [`.github/ISSUE_TEMPLATE/vendor-mapping-task.md`](.github/ISSUE_TEMPLATE/vendor-mapping-task.md): issue template for vendor field mapping and integration work.
