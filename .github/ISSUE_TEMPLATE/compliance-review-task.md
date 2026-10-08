@@ -64,4 +64,3 @@ Assign a compliance owner with authority to approve or reject the policy logic. 
 - [ ] Compliance owner has approved the related PR
 
 ## Notes
-

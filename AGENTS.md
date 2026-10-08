@@ -1,6 +1,8 @@
 # MedSync2 Coding-Agent Guidance
 
-This repository uses the Azure Essentials operationalization package as a planning and implementation guardrail for MedSync2 cloud, AI, security, resiliency, and GitHub workflow work.
+## Repository mission
+
+MedSync2 is a calculation-only Streamlit application for estimating medication units required until a refill synchronization date. Preserve the distinction between mathematical planning and clinical, prescribing, dispensing, legal, or compliance decisions.
 
 ## NEH Texas PMP policy guardrails
 
@@ -35,43 +37,70 @@ The following rules are **hard constraints** that apply to every agent, Codex ta
 - Any PR that touches PMP workflow logic, PDMP integration, prescribing authority rules, controlled-substance scheduling, or patient-identifier handling **must** include a compliance reviewer in the reviewers list and must not be merged without their approval.
 - Add `compliance-review-required` as a label on any such PR.
 
-## Source-boundary rules
+## Application invariants
+
+1. Keep calculation logic in `medsync/calculator.py`; do not call Streamlit from the core module.
+2. Use date-only semantics. Never calculate coverage from `datetime.now()` or a clock-dependent timedelta.
+3. Compute unit shortfall directly:
+   `max(coverage_days * daily_dose - units_remaining, 0)`.
+4. Use `Decimal` for medication quantities and doses.
+5. Treat both endpoint doses as explicit inputs. By default, cover only dates strictly between the calculation date and aligned refill date.
+6. Do not log form entries, medication labels, or results.
+7. Do not add autonomous clinical recommendations or represent output as medical advice.
+8. Add regression tests for every calculation change.
+
+## Required validation
+
+Before completing a code change, run:
+
+```bash
+python -m ruff check .
+python -m ruff format --check .
+python -m mypy medsync
+python -m bandit -q -r medsync med_sync_app.py
+python -m pytest
+python -m compileall -q medsync med_sync_app.py tests
+python -m pip_audit --requirement requirements.txt
+```
+
+## Sensitive-data guardrails
+
+- Never place real patient data in code, tests, examples, screenshots, issues, or pull requests.
+- Do not hard-code secrets, tenant IDs, subscription IDs, credentials, or environment-specific identifiers.
+- Do not claim a deployment is HIPAA, HITRUST, SOC 2, FedRAMP, or otherwise compliant without verified scope, evidence, and approval.
+- Any persistence, authentication, audit logging, external integration, or PHI handling requires an architecture/security review.
+
+## Azure Essentials source boundary
 
 When working from Azure Essentials material, keep these categories separate:
 
-1. **Source-derived Azure points**: concepts directly traceable to the Azure Essentials resource kit or the Azure Essentials update research supplied for this repository.
-2. **Current Microsoft documentation**: current product names, navigation, pricing model descriptions, compliance references, and official implementation docs that must be verified against Microsoft sources at time of use.
-3. **MedSync2-specific implementation decisions**: design choices made for this repository after reviewing its actual code, product requirements, regulated-data posture, and deployment target.
-4. **General cloud-market analysis**: neutral context, including Azure-vs-AWS comparisons, that should never be represented as a Microsoft source claim.
+1. **Source-derived Azure points**: concepts traceable to the Azure Essentials resource kit or supplied update research.
+2. **Current Microsoft documentation**: product names, navigation, pricing, compliance references, and implementation details that must be rechecked at time of use.
+3. **MedSync2-specific decisions**: choices made after reviewing the actual code, product requirements, data flows, regulated-data posture, and deployment target.
+4. **General cloud-market analysis**: neutral context that must not be represented as a Microsoft source claim.
 
-Do not imply that the Azure Essentials source deck directly compares Azure and AWS. It does not.
+Before adding cloud infrastructure, AI, compliance, or deployment code:
 
-## Current terminology baseline
+- update the applicable decision record in `docs/architecture/`;
+- link work to `docs/cloud-adoption-backlog.md` or an issue;
+- validate it against `docs/azure-essentials-operationalization.md`;
+- document security, cost, reliability, data, and compliance assumptions;
+- use hyphenated filenames for new user-facing documents, except required platform paths.
+
+## Current Azure terminology baseline
 
 Use current Microsoft terminology unless a legacy name is needed for searchability:
 
 - Microsoft Foundry, formerly Azure AI Foundry.
 - Microsoft Entra ID, formerly Azure Active Directory or Azure AD.
-- Azure Proactive Resiliency Library v2 when referencing APRL implementation guidance.
+- Azure Proactive Resiliency Library v2 when referencing APRL guidance.
 - Azure Well-Architected Framework when evaluating workload readiness.
-- Azure Monitor Baseline Alerts when standardizing Azure alerting baselines.
+- Azure Monitor Baseline Alerts when standardizing alerting baselines.
 - Azure Verified Modules when evaluating reusable Bicep or Terraform modules.
 
-## MedSync2 implementation guardrails
-
-Before adding cloud infrastructure, AI, compliance, or deployment code:
-
-1. Create or update a decision record in `docs/architecture/` if the change affects identity, tenancy, network topology, data residency, deployment topology, AI model behavior, protected data flow, or monitoring.
-2. Link the work to `docs/cloud-adoption-backlog.md` or create a new GitHub issue using the Azure Essentials task template.
-3. Validate the change against the operating model in `docs/azure-essentials-operationalization.md`.
-4. Prefer GitHub issues and small pull requests over large untracked changes.
-5. Use hyphenated filenames for new docs and deliverables. Keep GitHub-reserved paths such as `.github/ISSUE_TEMPLATE` when required by GitHub.
-6. Do not add claims of HIPAA, HITRUST, SOC 2, FedRAMP, or other compliance achievement without verified scope, evidence, and owner approval.
-7. Do not hard-code secrets, tenant IDs, subscription IDs, patient identifiers, API keys, or environment-specific credentials.
+Do not imply that the Azure Essentials source deck directly compares Azure and AWS.
 
 ## Pull request checklist
-
-Every cloud, AI, governance, or documentation PR should answer:
 
 - What MedSync2 capability does this enable?
 - Is the change source-derived, current-doc verified, or MedSync2-specific?
@@ -80,9 +109,11 @@ Every cloud, AI, governance, or documentation PR should answer:
 - What remains unverified or environment-specific?
 - Does this PR touch PMP workflow, PDMP integration, prescribing authority, or patient identifiers? If yes, is a compliance reviewer assigned?
 
-## Recommended docs to keep current
+## Recommended documents to keep current
 
-- `README.md`: concise repository orientation and links.
+- `README.md`: application orientation, calculation contract, and repository links.
+- `docs/architecture/application-design.md`: application boundary and deterministic contract.
 - `docs/azure-essentials-operationalization.md`: operating model and source boundary.
-- `docs/cloud-adoption-backlog.md`: prioritized execution queue.
-- `docs/architecture/`: decision records for durable architecture choices.
+- `docs/cloud-adoption-backlog.md`: prioritized cloud execution queue.
+- `docs/architecture/`: durable application and cloud architecture decisions.
+- `docs/release-readiness-checklist.md`: release and deployment gate.

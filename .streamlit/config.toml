@@ -1,0 +1,16 @@
+[browser]
+gatherUsageStats = false
+
+[client]
+showErrorDetails = "none"
+showErrorLinks = false
+toolbarMode = "minimal"
+
+[runner]
+magicEnabled = false
+enforceSerializableSessionState = true
+
+[server]
+headless = true
+enableCORS = true
+enableXsrfProtection = true
